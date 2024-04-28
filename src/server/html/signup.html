@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Timetable Scheduler - Log In</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+        }
+
+        .hero {
+            background-image: url("https://images.pexels.com/photos/1563356/pexels-photo-1563356.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"); /* Replace with your hero image */
+            background-size: cover;
+            background-position: center;
+            padding: 100px 0;
+            color: #fff;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 1.2em;
+            line-height: 1.5;
+        }
+
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+            background-color: #fff;
+            position: relative;
+        }
+
+        .auth-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 400px;
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
+        .form-container.active {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .form-container h3 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .form-container form {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-container label {
+            font-weight: bold;
+        }
+
+        .form-container input,
+        .form-container button {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-container button {
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .form-container.active.login {
+            animation: slideIn 0.5s forwards;
+        }
+
+        .form-container.login:not(.active) {
+            animation: slideOut 0.5s forwards;
+        }
+    </style>
+</head>
+<body>
+<header class="hero">
+    <h1>Streamline Your Teaching Schedule</h1>
+    <p>Connect with other teachers, choose your availability, and use our genetic algorithm to generate an optimized
+        timetable that works for everyone.</p>
+</header>
+
+<main class="auth-container">
+    <h2>Log In</h2>
+
+    <div class="form-container login active">
+        <h3>Log In</h3>
+        <div id="loginError" style="color: red;"></div>
+        <label for="username_login">Username:</label>
+        <input type="text" id="username_login" name="username" required>
+        <label for="password_login">Password:</label>
+        <input type="password" id="password_login" name="password" required>
+        <button id="loginBtn">Log In</button>
+    </div>
+
+    <script>
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            const username = document.getElementById('username_login').value;
+            const password = document.getElementById('password_login').value;
+
+            console.log(username, password);
+
+            // TODO: change this to login eventually
+            fetch(`http://127.0.0.1:3000/signup.html`, {
+                method: 'POST',
+                body: new URLSearchParams({
+                    username: username,
+                    password: password
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Login failed. Please check your credentials.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Handle success, e.g., redirect to dashboard
+                    console.log(data);
+                })
+                .catch(error => {
+                    // Handle error, e.g., display error message
+                    document.getElementById('loginError').textContent = error.message;
+                    console.error(error);
+                });
+        });
+    </script>
+
+</main>
+</body>
+</html>
