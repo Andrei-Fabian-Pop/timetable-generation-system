@@ -176,9 +176,10 @@
                     if (data.status === 'success') {
                         console.log("nice");
                     }
+                    // TODO: this will be the token system, once created
                     // const token = data.token; // Adjust according to your backend response
                     // document.cookie = `session_token=${token}; Secure; SameSite=Strict`;
-                    // window.location.href = '/dashboard.html';
+                    window.location.href = '/dashboard.html';
                 })
                 .catch(error => {
                     // Handle error, e.g., display error message

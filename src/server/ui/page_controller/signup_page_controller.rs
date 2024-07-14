@@ -153,6 +153,8 @@ impl PageControllerPost for SignupPageController {
             println!("Failed to check credentials: {}", e);
         }).unwrap();
 
+        // TODO: add a token system to remember a login
+
         if valid {
             Ok(Response::builder()
                 .status(StatusCode::OK)

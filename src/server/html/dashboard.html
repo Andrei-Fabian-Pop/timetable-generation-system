@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Timetable Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .timetable {
+            width: 80%;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            text-align: center;
+            padding: 10px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .add-button, .save-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .add-button:hover, .save-button:hover {
+            background-color: #45a049;
+        }
+        .submit-button {
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .submit-button:hover {
+            background-color: #007bb5;
+        }
+        .generated-timetable {
+            width: 80%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="timetable">
+        <h2>Timetable Generator</h2>
+        <table>
+            <tr>
+                <th></th>
+                <th>Monday</th>
+                <th>Tuesday</th>
+                <th>Wednesday</th>
+                <th>Thursday</th>
+                <th>Friday</th>
+            </tr>
+            <tr>
+                <th>Odd Weeks</th>
+                <td><button class="add-button" onclick="addTimeframe(this)">+</button></td>
+                <td><button class="add-button" onclick="addTimeframe(this)">+</button></td>
+                <td><button class="add-button" onclick="addTimeframe(this)">+</button></td>
+                <td><button class="add-button" onclick="addTimeframe(this)">+</button></td>
+                <td><button class="add-button" onclick="addTimeframe(this)">+</button></td>
+            </tr>
+            <tr>
+                <th>Even Weeks</th>
+                <td><button class="add-button" onclick="addTimeframe(this)">+</button></td>
+                <td><button class="add-button" onclick="addTimeframe(this)">+</button></td>
+                <td><button class="add-button" onclick="addTimeframe(this)">+</button></td>
+                <td><button class="add-button" onclick="addTimeframe(this)">+</button></td>
+                <td><button class="add-button" onclick="addTimeframe(this)">+</button></td>
+            </tr>
+        </table>
+        <button class="submit-button" onclick="submitTimetable()">Submit Timetable</button>
+    </div>
+    <div class="generated-timetable">
+        <h2>Last Generated Timetable</h2>
+        <div id="timetable-message">No timetable available.</div>
+    </div>
+</div>
+
+<script>
+    function addTimeframe(button) {
+        let cell = button.parentElement;
+        let startTimeInput = document.createElement("input");
+        startTimeInput.type = "time";
+        startTimeInput.className = "time-input";
+        let endTimeInput = document.createElement("input");
+        endTimeInput.type = "time";
+        endTimeInput.className = "time-input";
+        let saveButton = document.createElement("button");
+        saveButton.className = "save-button";
+        saveButton.textContent = "Save";
+        saveButton.onclick = function() {
+            saveTimeframe(cell, startTimeInput.value, endTimeInput.value);
+            cell.removeChild(startTimeInput);
+            cell.removeChild(endTimeInput);
+            cell.removeChild(saveButton);
+        };
+        cell.appendChild(startTimeInput);
+        cell.appendChild(endTimeInput);
+        cell.appendChild(saveButton);
+    }
+
+    function saveTimeframe(cell, startTime, endTime) {
+        if (startTime && endTime) {
+            let timeframeDiv = document.createElement("div");
+            timeframeDiv.textContent = `${startTime} - ${endTime}`;
+            cell.insertBefore(timeframeDiv, cell.querySelector(".add-button"));
+        }
+    }
+
+    function submitTimetable() {
+        let table = document.querySelector("table");
+        let timetable = [];
+        for (let row of table.rows) {
+            let rowData = [];
+            for (let cell of row.cells) {
+                if (cell.querySelector("button")) {
+                    let timeframes = [];
+                    for (let div of cell.querySelectorAll("div")) {
+                        timeframes.push(div.textContent);
+                    }
+                    rowData.push(timeframes);
+                } else {
+                    rowData.push(cell.textContent);
+                }
+            }
+            timetable.push(rowData);
+        }
+        console.log("Timetable submitted:", timetable);
+        // Here you would send the timetable to the backend
+        document.getElementById("timetable-message").textContent = "Timetable has been generated.";
+    }
+
+    async function fetchLastGeneratedTimetable() {
+        try {
+            const response = await fetch('/last-generated-timetable');
+            const data = await response.json();
+
+            if (data && data.timetable) {
+                renderTimetable(data.timetable);
+            } else {
+                document.getElementById("timetable-message").textContent = "No timetable available.";
+            }
+        } catch (error) {
+            console.error('Error fetching timetable:', error);
+            document.getElementById("timetable-message").textContent = "Error fetching timetable.";
+        }
+    }
+
+    function renderTimetable(timetable) {
+        let container = document.createElement('table');
+        container.innerHTML = `
+                <tr>
+                    <th></th>
+                    <th>Monday</th>
+                    <th>Tuesday</th>
+                    <th>Wednesday</th>
+                    <th>Thursday</th>
+                    <th>Friday</th>
+                </tr>
+                <tr>
+                    <th>Odd Weeks</th>
+                    ${timetable[1].map(times => `<td>${times.join('<br>')}</td>`).join('')}
+                </tr>
+                <tr>
+                    <th>Even Weeks</th>
+                    ${timetable[2].map(times => `<td>${times.join('<br>')}</td>`).join('')}
+                </tr>
+            `;
+        document.getElementById("timetable-message").innerHTML = "";
+        document.getElementById("timetable-message").appendChild(container);
+    }
+
+    // Fetch the last generated timetable on page load
+    window.onload = fetchLastGeneratedTimetable;
+</script>
+</body>
+</html>
