@@ -14,7 +14,7 @@ use url::form_urlencoded::Parse;
 use url::Url;
 use regex::Regex;
 use crate::server::macros::empty_box_body;
-
+use crate::server::ui::page_controller::dashboard_controller::DashboardPageController;
 use crate::server::ui::page_controller::landing_page_controller::LandingPageController;
 use crate::server::ui::page_controller::page_controller_traits::{PageControllerGet, PageControllerPost};
 use crate::server::ui::page_controller::signup_page_controller::{SignupPageController};
@@ -82,7 +82,12 @@ impl HttpServer {
                     // Some(Box::new(SignupPageController::new()))
                     return SignupPageController::get_request();
                 }
-                _ => {  }
+                "/dashboard.html" => {
+                    return DashboardPageController::get_request();
+                }
+                _ => {
+                    // TODO: return empty page with macro
+                }
             };
 
             // let controller = controller.unwrap();
@@ -111,11 +116,9 @@ impl HttpServer {
             // }
 
             // let request = controller.post_request(request).unwrap();
+            println!("{}", request.uri().path());
 
-            let mut res: String = "ahm".to_string();
-            if request.method() == Method::POST {
-                res = "here".to_string();
-
+            if request.uri().path() == "/login" {
                 return SignupPageController::post_request(request).await;
             } else {
                 Ok(Response::builder()
