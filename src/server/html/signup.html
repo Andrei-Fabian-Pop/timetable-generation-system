@@ -156,6 +156,9 @@
             // TODO: change this to login eventually
             fetch(`http://127.0.0.1:3000/signup.html`, {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
                 body: new URLSearchParams({
                     username: username,
                     password: password
@@ -165,11 +168,17 @@
                     if (!response.ok) {
                         throw new Error('Login failed. Please check your credentials.');
                     }
+                    // Extract and parse JSON response
                     return response.json();
                 })
                 .then(data => {
-                    // Handle success, e.g., redirect to dashboard
-                    console.log(data);
+                    console.log(data)
+                    if (data.status === 'success') {
+                        console.log("nice");
+                    }
+                    // const token = data.token; // Adjust according to your backend response
+                    // document.cookie = `session_token=${token}; Secure; SameSite=Strict`;
+                    // window.location.href = '/dashboard.html';
                 })
                 .catch(error => {
                     // Handle error, e.g., display error message
@@ -178,6 +187,7 @@
                 });
         });
     </script>
+
 
 </main>
 </body>
