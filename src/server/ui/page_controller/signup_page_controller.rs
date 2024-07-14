@@ -8,8 +8,9 @@ use http_body_util::combinators::BoxBody;
 use hyper::{Method, Request, Response, StatusCode};
 use hyper::body::Body;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use url::form_urlencoded;
-
+use crate::db::src::database::Database;
 use crate::server::macros::{empty_box_body, full_box_body};
 use crate::server::ui::page_controller::page_controller_traits::{PageControllerGet, PageControllerPost};
 
@@ -125,6 +126,11 @@ impl PageControllerGet for SignupPageController {
 
 impl PageControllerPost for SignupPageController {
     async fn post_request(request: Request<hyper::body::Incoming>) -> Result<Response<BoxBody<Bytes, Infallible>>, hyper::Error>  {
+        // TODO: change, this is more than messy :))
+        let db = Database::new("host=localhost user=andrew dbname=timetable_generator_db password=test_password")
+            .await
+            .expect("Failed to connect to the database");
+
         println!("=> POST REQUEST");
 
         let b = request.collect().await?.to_bytes();
@@ -138,14 +144,31 @@ impl PageControllerPost for SignupPageController {
             password: String,
         }
 
-        let up = UserCredentials {
-            username: params["username"].to_string() + "back",
-            password: params["password"].to_string() + "back",
+        let uc = UserCredentials {
+            username: params["username"].to_string(),
+            password: params["password"].to_string(),
         };
 
-        Ok(Response::builder()
-            .status(StatusCode::OK)
-            .body(full_box_body!(serde_json::to_string(&up).expect("Ups")))
-            .unwrap())
+        let valid = db.check_credentials(&uc.username, &uc.password).await.map_err(|e| {
+            println!("Failed to check credentials: {}", e);
+        }).unwrap();
+
+        if valid {
+            Ok(Response::builder()
+                .status(StatusCode::OK)
+                .body(full_box_body!(serde_json::to_string(&json!({
+                "status": "success",
+                "message": "Login successful"
+            })).expect("Ups")))
+                .unwrap())
+        } else {
+            Ok(Response::builder()
+                .status(StatusCode::UNAUTHORIZED)
+                .body(full_box_body!(serde_json::to_string(&json!({
+                "status": "error",
+                "message": "Invalid credentials"
+            })).expect("Ups")))
+                .unwrap())
+        }
     }
 }
