@@ -1,0 +1,9 @@
+[database]
+host = "localhost"
+user = "os_username"
+dbname = "your_database_name"
+password = "your_strng_password"
+
+[server]
+host = [127, 0, 0, 1]
+port = 3000

@@ -11,3 +11,19 @@ macro_rules! full_box_body {
     };
 }
 pub(crate) use full_box_body;
+
+macro_rules! load_config {
+    ($config_type:ty) => {
+        match <$config_type>::load() {
+            Ok(config) => {
+                println!("Configuration loaded successfully: {:?}", config);
+                config
+            }
+            Err(e) => {
+                // The app should crash fast to notice the issue
+                panic!("Failed to load configuration: {:?}", e);
+            }
+        }
+    };
+}
+pub(crate) use load_config;
