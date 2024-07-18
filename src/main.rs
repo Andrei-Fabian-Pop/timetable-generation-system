@@ -1,6 +1,6 @@
 mod server;
-mod ext;
 mod db;
+mod app_config;
 
 use crate::server::server::HttpServer;
 
