@@ -27,7 +27,7 @@ impl Generator {
             m_subject_indexes,
             m_time_tables: Vec::new(),
             m_offspring_mutex: Arc::new(Mutex::new(())),
-            m_thread_count: 4,  // Example value
+            m_thread_count: GENETIC_THREAD_COUNT,
         };
 
         generator.genetic_algorithm(CLASSES_PER_DAY * DAYS, GROUPS, GENETIC_POPULATION_SIZE, GENETIC_GENERATIONS);
